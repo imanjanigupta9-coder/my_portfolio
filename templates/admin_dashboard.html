@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Admin Dashboard | Anjani</title>
+</head>
+<body class="admin-page">
+    <nav>
+        <div class="logo">ANJANI<span>_ADMIN</span></div>
+        <a href="/logout" class="sub-btn" style="background: #ef4444;">Logout</a>
+    </nav>
+
+    <main class="admin-container">
+        <section class="admin-card">
+            <h2>Add New Project</h2>
+            <form method="POST" class="admin-form">
+                <input type="text" name="title" placeholder="Project Title (e.g., Student Management System)" required>
+                <textarea name="desc" placeholder="Project Description..." required></textarea>
+                <input type="text" name="stack" placeholder="Tech Stack (e.g., Java, MySQL)" required>
+                <input type="text" name="img" placeholder="Image Filename (e.g., student.jpg)" required>
+                <input type="text" name="git" placeholder="GitHub Link (or leave blank)">
+                <button type="submit" class="submit-btn">Publish Project</button>
+            </form>
+        </section>
+
+        <section class="admin-card">
+            <h2>Manage Projects</h2>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Stack</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in projects %}
+                    <tr>
+                        <td>{{ p.title }}</td>
+                        <td>{{ p.stack }}</td>
+                        <td>
+                            <a href="{{ url_for('delete_project', id=p.id) }}" class="delete-link" onclick="return confirm('Delete this project?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Added Google Fonts for a more professional look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Anjani | Portfolio</title>
+</head>
+<body>
+    <!-- 1. NAVIGATION WITH THEME TOGGLE & SUBSCRIBER LOGIN -->
+    <nav>
+        <div class="logo">ANJANI<span>.</span></div>
+        <div class="menu">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#projects">Projects</a>
+            
+            {% if not session.get('is_subscriber') %}
+                <button class="sub-btn" onclick="openSubModal()">Free Subscriber</button>
+            {% else %}
+                <span class="sub-welcome">Hi, Subscriber!</span>
+            {% endif %}
+
+            <button id="theme-toggle" class="mode-btn">
+                <span class="icon-sun">☀️</span>
+                <span class="icon-moon">🌙</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 2. HERO SECTION -->
+    <section id="home" class="scroll-section">
+        <div class="hero-content">
+            <div class="profile-wrapper">
+                <img src="{{ url_for('static', filename='images/profile.jpg') }}" class="profile-img" alt="Anjani">
+            </div>
+            <h1 class="reveal-text">MCA Graduate & <br><span>Python Developer</span></h1>
+            <p class="location-tag">📍 Based in Bihar, India</p>
+        </div>
+    </section>
+
+    <!-- 3. ABOUT & SKILLS SECTION -->
+    <section id="about" class="scroll-section">
+        <div class="container">
+            <h2>About Me</h2>
+            <p>I am a passionate MCA graduate (Class of 2025) specializing in Python development, SQL database management, and Software Testing.</p>
+            
+            <div class="skills-grid">
+                <div class="skill-item">Python (OOP)</div>
+                <div class="skill-item">MySQL/SQLite</div>
+                <div class="skill-item">Manual Testing</div>
+                <div class="skill-item">Data Visualization</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. PROJECTS SECTION (DYNAMIC GRID) -->
+    <section id="projects" class="scroll-section">
+        <h2 class="section-title">My Projects</h2>
+        <div class="grid">
+            {% for p in projects %}
+            <div class="card" onclick="showDetails('{{p.title}}', '{{p.description}}', '{{p.stack}}', '{{p.github_url}}')">
+                <div class="card-image-box">
+                    <img src="{{ url_for('static', filename='images/' + p.image_url) }}" alt="{{ p.title }}">
+                </div>
+                <div class="card-info">
+                    <h3>{{ p.title }}</h3>
+                    <small>{{ p.stack }}</small>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Dynamic "More Work" Card -->
+            <div class="card plus-card">
+                <div class="plus-wrapper">
+                    <div class="plus-icon">+</div>
+                    <p>More work loading...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. SUBSCRIBER MATERIALS (HIDDEN BY DEFAULT) -->
+    {% if session.get('is_subscriber') %}
+    <section id="materials" class="scroll-section subscriber-only">
+        <h2>Exclusive Materials</h2>
+        <div class="material-list">
+            <!-- These would come from your 'materials' table in the DB -->
+            <p>New learning resources and project files are available for you here!</p>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 6. MODALS -->
+    
+    <!-- Project Detail Modal -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="m-title"></h2>
+            <div class="tag" id="m-stack"></div>
+            <p id="m-desc"></p>
+            <div id="m-repo" class="repo-box"></div>
+        </div>
+    </div>
+
+    <!-- Subscriber Login Modal -->
+    <div id="subModal" class="modal">
+        <div class="modal-content login-modal">
+            <span class="close" onclick="closeSubModal()">&times;</span>
+            <h2>Free Subscriber Login</h2>
+            <p>Enter your email to access my project materials.</p>
+            <form action="/subscriber_login" method="POST">
+                <input type="email" name="email" placeholder="yourname@email.com" required>
+                <button type="submit" class="submit-btn">Access Materials</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 7. FLOATING CONTACT -->
+    <div class="contact-float">
+        <a href="https://wa.me/YOUR_MOBILE_HERE" target="_blank" class="whatsapp-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+            <span>Chat with me</span>
+        </a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

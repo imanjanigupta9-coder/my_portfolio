@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Subscriber Login | Anjani</title>
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <a href="/" class="back-home">← Back to Portfolio</a>
+
+        <div class="login-box">
+            <div class="login-header">
+                <h2>Join the Community<span>.</span></h2>
+                <p>Login as a <strong>Free Subscriber</strong> to access project documentation, source codes, and exclusive MCA learning materials[cite: 5].</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="flash-error">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form action="/subscriber_login" method="POST" class="auth-form">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="name@example.com" required>
+                </div>
+                
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Access Materials</button>
+            </form>
+
+            <div class="login-footer">
+                <p>Are you the Admin? <a href="/admin">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+</body>
+</html>
