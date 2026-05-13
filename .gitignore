@@ -10,4 +10,4 @@ database.db
 
 # Environments
 .env
-.flaskenv
+.flaskenvgit add .

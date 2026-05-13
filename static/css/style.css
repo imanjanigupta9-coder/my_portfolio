@@ -80,14 +80,320 @@ nav {
     transform: translateY(0);
 }
 
-.hero-content { text-align: center; }
+.hero-section {
+    background: radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 35%),
+                linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+}
+
+.hero-content {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.profile-wrapper {
+    display: inline-flex;
+    background: rgba(37, 99, 235, 0.08);
+    padding: 12px;
+    border-radius: 50%;
+    margin-bottom: 2rem;
+}
+
 .profile-img {
     width: 180px;
     height: 180px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--primary);
+    border: 5px solid rgba(37, 99, 235, 0.4);
+}
+
+.hero-content h1 {
+    font-size: clamp(2.7rem, 4vw, 4.5rem);
+    line-height: 1.05;
+    margin-bottom: 1rem;
+}
+
+.hero-content h1 span {
+    color: var(--primary);
+}
+
+.hero-subtitle {
+    max-width: 720px;
+    margin: 0 auto 1.5rem;
+    color: #4b5563;
+    font-size: 1.05rem;
+    line-height: 1.75;
+}
+
+.location-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(37, 99, 235, 0.08);
+    color: #374151;
+    padding: 0.9rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
     margin-bottom: 2rem;
+}
+
+.hero-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.primary-btn,
+.secondary-btn,
+.repo-btn,
+.submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.95rem 1.7rem;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    text-decoration: none;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.secondary-btn {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.repo-btn:hover,
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.14);
+}
+
+.section-title {
+    font-size: 2.4rem;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+    max-width: 720px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.contact-section {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.contact-card,
+.map-card {
+    padding: 2rem;
+    border-radius: 28px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.06);
+}
+
+.contact-card h2,
+.map-card h2 {
+    margin-bottom: 1rem;
+}
+
+.contact-card p {
+    color: #475569;
+    margin-bottom: 1.75rem;
+    line-height: 1.8;
+}
+
+.contact-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.2rem;
+}
+
+.contact-item strong {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.contact-item a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.map-wrapper {
+    width: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.map-wrapper iframe {
+    width: 100%;
+    height: 320px;
+    border: 0;
+}
+
+.map-note {
+    margin-top: 1rem;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.admin-scroll-btn {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 1010;
+    display: none;
+    background: rgba(37, 99, 235, 0.95);
+    color: white;
+    padding: 0.95rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+}
+
+.admin-scroll-btn.show {
+    display: inline-flex;
+}
+
+@media (max-width: 980px) {
+    nav {
+        padding: 1.2rem 6%;
+    }
+
+    .scroll-section {
+        padding: 90px 6%;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .menu {
+        flex-wrap: wrap;
+        gap: 0.9rem;
+    }
+
+    nav {
+        padding: 1rem 5%;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.7rem;
+    }
+
+    .location-tag {
+        font-size: 0.95rem;
+    }
+
+    .admin-scroll-btn {
+        right: 1rem;
+        bottom: 1rem;
+    }
+}
+
+.admin-page {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.admin-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 6rem auto 4rem;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+.admin-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 25px 80px rgba(15, 23, 42, 0.05);
+}
+
+.admin-card h2 {
+    margin-bottom: 1.5rem;
+}
+
+.admin-form {
+    display: grid;
+    gap: 1rem;
+}
+
+.admin-form input,
+.admin-form textarea {
+    width: 100%;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.admin-form textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    text-align: left;
+    padding: 1rem 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+    color: #374151;
+    font-weight: 700;
+}
+
+.delete-link {
+    color: #dc2626;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.delete-link:hover {
+    text-decoration: underline;
 }
 
 /* 4. PROJECT GRID */
@@ -112,8 +418,62 @@ nav {
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-.card-image-box img { width: 100%; height: 200px; object-fit: cover; }
-.card-info { padding: 1.5rem; }
+.card-image-box {
+    position: relative;
+    width: 100%;
+    background: #f0f0f0;
+}
+
+.card-image-box > img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.project-slider-thumbs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.75rem 0.75rem 0.4rem;
+    background: rgba(255, 255, 255, 0.08);
+    margin-top: 0.5rem;
+}
+
+.project-thumb {
+    width: 58px;
+    height: 58px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.project-thumb:hover,
+.project-thumb.active {
+    border-color: var(--primary);
+}
+
+.image-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(37, 99, 235, 0.9);
+    color: white;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.card-info {
+    padding: 1.5rem;
+}
+
+.card-info h3 {
+    margin-bottom: 0.5rem;
+}
 
 /* Plus Card Design */
 .plus-card {
@@ -122,9 +482,32 @@ nav {
     justify-content: center;
     border: 2px dashed var(--border);
     background: transparent;
+    cursor: default;
 }
 
-.plus-icon { font-size: 3rem; color: var(--primary); margin-bottom: 10px; }
+.plus-card:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.plus-wrapper {
+    text-align: center;
+}
+
+.plus-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.plus-wrapper p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.card-info h3 {
+    margin-bottom: 0.5rem;
+}
 
 /* 5. MODALS */
 .modal {
@@ -146,6 +529,25 @@ nav {
     width: 90%;
     max-width: 600px;
     position: relative;
+    border: 1px solid var(--border);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-images-slider {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    padding-bottom: 0.5rem;
+}
+
+.modal-images-slider img {
+    width: 150px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
     border: 1px solid var(--border);
 }
 
@@ -185,9 +587,9 @@ nav {
     box-shadow: 0 10px 15px rgba(0,0,0,0.2);
 }
 
-
-
-.whatsapp-btn img { width: 24px; }
+.whatsapp-btn img {
+    width: 24px;
+}
 
 /* 7. THEME TOGGLE BUTTON */
 .mode-btn {

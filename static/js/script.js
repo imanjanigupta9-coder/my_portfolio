@@ -25,7 +25,7 @@ function showDetails(title, desc, stack, github) {
     
     let repoDiv = document.getElementById('m-repo');
     
-    // The "Sorry" Logic with Apology Sign
+    // Display GitHub link or "Not Available"
     if (github && github !== "None" && github !== "" && github !== "null") {
         repoDiv.innerHTML = `
             <a href="${github}" target="_blank" class="repo-btn">
@@ -34,13 +34,13 @@ function showDetails(title, desc, stack, github) {
     } else {
         repoDiv.innerHTML = `
             <div class="apology-box">
-                <p>⚠️ <strong>Sorry!</strong> No public repository available for this project yet. 🙏</p>
-                <small>It might be a private client project or currently under heavy development.</small>
+                <p><strong>GitHub Link:</strong> Not Available</p>
+                <small>This project's source code is not publicly available.</small>
             </div>`;
     }
     
-    document.getElementById('projectModal').style.display = "flex"; // Use flex for centering
-    body.style.overflow = "hidden"; // Prevent background scroll
+    document.getElementById('projectModal').style.display = "flex";
+    body.style.overflow = "hidden";
 }
 
 function closeModal() {
@@ -57,6 +57,16 @@ function openSubModal() {
 function closeSubModal() {
     document.getElementById('subModal').style.display = "none";
     body.style.overflow = "auto";
+}
+
+function switchProjectSlide(projectId, imgUrl) {
+    const mainImage = document.getElementById(`projectMainImage-${projectId}`);
+    if (!mainImage) return;
+    mainImage.src = imgUrl;
+    const thumbs = mainImage.parentElement.querySelectorAll('.project-thumb');
+    thumbs.forEach(thumb => {
+        thumb.classList.toggle('active', thumb.dataset.img === imgUrl);
+    });
 }
 
 // 4. SCROLL REVEAL ANIMATION (Intersection Observer)
@@ -77,7 +87,18 @@ document.querySelectorAll('.scroll-section').forEach(section => {
     observer.observe(section);
 });
 
-// 5. CLOSE MODALS ON OUTSIDE CLICK
+// 5. ADMIN BUTTON APPEARS AFTER SCROLL
+const adminButton = document.getElementById('admin-scroll-btn');
+window.addEventListener('scroll', () => {
+    if (!adminButton) return;
+    if (window.scrollY > 420) {
+        adminButton.classList.add('show');
+    } else {
+        adminButton.classList.remove('show');
+    }
+});
+
+// 6. CLOSE MODALS ON OUTSIDE CLICK
 window.onclick = function(event) {
     const projectModal = document.getElementById('projectModal');
     const subModal = document.getElementById('subModal');

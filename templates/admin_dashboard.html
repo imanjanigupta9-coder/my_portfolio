@@ -3,6 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .image-slider { display: flex; gap: 1rem; overflow-x: auto; padding: 0.5rem 0; margin-top: 0.5rem; }
+        .slider-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border); cursor: pointer; }
+        .preview-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
+        .preview-card { position: relative; width: 120px; height: 90px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+        .preview-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .preview-remove { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border: none; border-radius: 999px; background: rgba(0,0,0,0.55); color: #fff; cursor: pointer; font-size: 1rem; display: grid; place-items: center; }
+        .preview-remove:hover { background: rgba(0,0,0,0.8); }
+        .preview-row img { width: 120px; height: 80px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
+        .site-image-field { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; }
+        .site-image-label { cursor: pointer; width: 160px; height: 160px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; border: 2px dashed var(--border); background: var(--card); }
+        .site-image-label img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .site-image-placeholder { width: 100%; height: 100%; display: grid; place-items: center; color: #6b7280; font-weight: 700; text-align: center; padding: 1rem; }
+        .site-image-note { color: #6b7280; font-size: 0.95rem; }
+        .file-input-label { display: inline-block; background: var(--primary); color: white; padding: 0.75rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 0.5rem; }
+        .edit-btn, .upload-btn { padding: 0.4rem 0.8rem; margin-right: 0.4rem; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+        .upload-btn { background: #059669; }
+        .edit-images-section { margin-top: 1rem; }
+        .edit-image-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
+        .edit-image-card { position: relative; width: 110px; height: 82px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
+        .edit-image-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .edit-image-delete { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border: none; border-radius: 999px; background: rgba(0,0,0,0.55); color: #fff; cursor: pointer; font-size: 1rem; display: grid; place-items: center; z-index: 2; }
+        .edit-image-delete:hover { background: rgba(0,0,0,0.8); }
+        .no-images { color: #6b7280; font-size: 0.95rem; }
+        .edit-btn:hover { background: #1d4ed8; }
+        .upload-btn:hover { background: #047857; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000; overflow-y: auto; }
+        .modal-overlay.active { display: flex; }
+        .edit-modal { background: var(--card); padding: 2rem; border-radius: 24px; max-width: 600px; width: 90%; position: relative; margin: auto; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+        .table-responsive { overflow-x: auto; }
+    </style>
     <title>Admin Dashboard | Anjani</title>
 </head>
 <body class="admin-page">
@@ -12,41 +44,383 @@
     </nav>
 
     <main class="admin-container">
+        <!-- Website Details Section -->
+        <section class="admin-card">
+            <h2>Update Website Details</h2>
+            <form method="POST" enctype="multipart/form-data" class="admin-form">
+                <input type="hidden" name="form_type" value="settings">
+                <div class="site-image-field">
+                    <label class="site-image-label" for="siteImageInput">
+                        {% if settings.hero_image_url %}
+                        <img id="siteImagePreviewCircle" src="{{ url_for('static', filename=settings.hero_image_url) }}" alt="Website Image">
+                        {% else %}
+                        <div id="siteImagePreviewCircle" class="site-image-placeholder">No Image</div>
+                        {% endif %}
+                        <input type="file" name="site_image" id="siteImageInput" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" onchange="previewSiteImage(this)">
+                    </label>
+                    <small class="site-image-note">Click the circle to change website image</small>
+                </div>
+                <input type="text" name="site_name" value="{{ settings.site_name }}" placeholder="Website name" required>
+                <input type="text" name="tagline" value="{{ settings.tagline }}" placeholder="Tagline or short heading" required>
+                <textarea name="about" placeholder="About summary..." required>{{ settings.about }}</textarea>
+                <input type="text" name="location" value="{{ settings.location }}" placeholder="Public location text" required>
+                <input type="email" name="contact_email" value="{{ settings.contact_email }}" placeholder="Contact email" required>
+                <input type="text" name="whatsapp" value="{{ settings.whatsapp }}" placeholder="WhatsApp number (digits only)">
+                <input type="text" name="phone" value="{{ settings.phone }}" placeholder="Phone number">
+                <input type="text" name="map_query" value="{{ settings.map_query }}" placeholder="Map search query" required>
+                <button type="submit" class="submit-btn">Save Website Info</button>
+            </form>
+        </section>
+
+        <!-- Add New Project Section -->
         <section class="admin-card">
             <h2>Add New Project</h2>
-            <form method="POST" class="admin-form">
-                <input type="text" name="title" placeholder="Project Title (e.g., Student Management System)" required>
+            <form method="POST" enctype="multipart/form-data" class="admin-form">
+                <input type="hidden" name="form_type" value="project">
+                <input type="text" name="title" placeholder="Project Title" required>
                 <textarea name="desc" placeholder="Project Description..." required></textarea>
-                <input type="text" name="stack" placeholder="Tech Stack (e.g., Java, MySQL)" required>
-                <input type="text" name="img" placeholder="Image Filename (e.g., student.jpg)" required>
-                <input type="text" name="git" placeholder="GitHub Link (or leave blank)">
+                <input type="text" name="stack" placeholder="Tech Stack (e.g., Python, MySQL)" required>
+                <input type="text" name="git" placeholder="GitHub Link (leave blank if not available)">
+                
+                <div>
+                    <label class="file-input-label">
+                        📷 Upload Images (Multiple) - 800x600px, Max 2MB each
+                        <input type="file" name="images" id="projectImagesInput" multiple accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" onchange="previewProjectImages(this)">
+                    </label>
+                    <small style="display: block; color: #6b7280;">Image specs: 800x600px, Max 2MB per image</small>
+                    <div class="preview-row" id="projectPreview"></div>
+                    <small id="projectPreviewCount" style="display: block; margin-top: 0.5rem; color: #6b7280;">0 files selected</small>
+                </div>
+                
                 <button type="submit" class="submit-btn">Publish Project</button>
             </form>
         </section>
 
+        <!-- Manage Projects Section -->
         <section class="admin-card">
             <h2>Manage Projects</h2>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Stack</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in projects %}
-                    <tr>
-                        <td>{{ p.title }}</td>
-                        <td>{{ p.stack }}</td>
-                        <td>
-                            <a href="{{ url_for('delete_project', id=p.id) }}" class="delete-link" onclick="return confirm('Delete this project?')">Delete</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% if projects_data %}
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Description</th>
+                            <th>Images</th>
+                            <th>GitHub</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pd in projects_data %}
+                        <tr>
+                            <td><strong>{{ pd.project.title }}</strong><br><small style="color: #6b7280;">{{ pd.project.stack }}</small></td>
+                            <td><small>{{ pd.project.description[:60] }}...</small></td>
+                            <td>
+                                <small><strong>{{ pd.images | length }}</strong> image(s)</small>
+                            </td>
+                            <td>
+                                {% if pd.project.github_url %}
+                                    <a href="{{ pd.project.github_url }}" target="_blank" style="color: var(--primary); font-size: 0.9rem;">View</a>
+                                {% else %}
+                                    <small style="color: #9ca3af;">Not Available</small>
+                                {% endif %}
+                                <div id="projectImagesData-{{ pd.project.id }}" style="display:none;">
+                                    {% for img in pd.images %}
+                                        <span data-id="{{ img.id }}" data-url="{{ url_for('static', filename=img.image_url) }}"></span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td style="white-space: nowrap;">
+                                <button type="button" class="edit-btn" onclick="openEditModal({{ pd.project.id }}, '{{ pd.project.title | replace('\'', '\\\'') }}', '{{ pd.project.description | replace('\'', '\\\'') }}', '{{ pd.project.stack | replace('\'', '\\\'') }}', '{{ pd.project.github_url }}')">Edit</button>
+                                <a href="{{ url_for('delete_project', id=pd.project.id) }}" class="delete-link" onclick="return confirm('Delete this project?')" style="font-size: 0.8rem;">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>No projects yet. Create one above!</p>
+            {% endif %}
         </section>
     </main>
+
+    <!-- Edit Project Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="edit-modal">
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            <h2>Edit Project Details</h2>
+            <form method="POST" class="admin-form">
+                <input type="hidden" name="form_type" value="edit_project">
+                <input type="hidden" name="project_id" id="editProjectId">
+                <input type="text" name="title" id="editTitle" placeholder="Project Title" required>
+                <textarea name="desc" id="editDesc" placeholder="Project Description..." required></textarea>
+                <input type="text" name="stack" id="editStack" placeholder="Tech Stack" required>
+                <input type="text" name="git" id="editGit" placeholder="GitHub Link (optional)">
+                <div class="edit-images-section">
+                    <h3>Uploaded Images</h3>
+                    <div id="editImageRow" class="edit-image-row"></div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.75rem;">
+                        <button type="button" class="upload-btn" onclick="openImageModal(document.getElementById('editProjectId').value)">+ Add Image</button>
+                        <small style="color: #6b7280;">Upload additional image(s) for this project while editing.</small>
+                    </div>
+                    <small style="display: block; color: #6b7280; margin-top: 0.5rem;">Click an image to replace it. Use × to delete.</small>
+                </div>
+                <button type="submit" class="submit-btn">Publish Update</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Images Modal -->
+    <div class="modal-overlay" id="imageModal">
+        <div class="edit-modal">
+            <button class="modal-close" onclick="closeImageModal()">&times;</button>
+            <h2>Add Images to Project</h2>
+            <form method="POST" enctype="multipart/form-data" class="admin-form">
+                <input type="hidden" name="form_type" value="add_images">
+                <input type="hidden" name="project_id" id="imageProjectId">
+                <label class="file-input-label">
+                    📷 Select Images - 800x600px, Max 2MB each
+                    <input type="file" name="images" id="imageInput" multiple accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" onchange="updateFileCount(this)">
+                </label>
+                <small id="imageCount" style="display: block; margin-top: 0.5rem; color: #6b7280;">0 files selected</small>
+                <button type="submit" class="submit-btn">Upload Images</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Replace Image Modal -->
+    <div class="modal-overlay" id="replaceModal">
+        <div class="edit-modal">
+            <button class="modal-close" onclick="closeReplaceModal()">&times;</button>
+            <h2>Replace Image</h2>
+            <form method="POST" enctype="multipart/form-data" class="admin-form">
+                <input type="hidden" name="form_type" value="replace_image">
+                <input type="hidden" name="image_id" id="replaceImageId">
+                <label class="file-input-label">
+                    📷 Choose replacement image
+                    <input type="file" name="image" id="replaceImageInput" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" onchange="previewReplaceImage(this)">
+                </label>
+                <small id="replacePreviewText" style="display: block; margin-top: 0.5rem; color: #6b7280;">No file chosen yet.</small>
+                <button type="submit" class="submit-btn">Replace Image</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(id, title, desc, stack, git) {
+            document.getElementById('editProjectId').value = id;
+            document.getElementById('editTitle').value = title;
+            document.getElementById('editDesc').value = desc;
+            document.getElementById('editStack').value = stack;
+            document.getElementById('editGit').value = git || '';
+            renderEditProjectImages(id);
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function renderEditProjectImages(projectId) {
+            const container = document.getElementById('editImageRow');
+            container.innerHTML = '';
+            const dataElement = document.getElementById(`projectImagesData-${projectId}`);
+            if (!dataElement) {
+                container.innerHTML = '<div class="no-images">No images uploaded yet.</div>';
+                return;
+            }
+            const spans = Array.from(dataElement.querySelectorAll('span'));
+            if (!spans.length) {
+                container.innerHTML = '<div class="no-images">No images uploaded yet.</div>';
+                return;
+            }
+            spans.forEach(span => {
+                const imageId = span.dataset.id;
+                const imageUrl = span.dataset.url;
+                const card = document.createElement('div');
+                card.className = 'edit-image-card';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = 'edit-image-delete';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteImage(imageId);
+                });
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Project Image';
+                img.title = 'Click to replace';
+                img.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openReplaceModal(imageId);
+                });
+
+                card.appendChild(deleteBtn);
+                card.appendChild(img);
+                container.appendChild(card);
+            });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function openImageModal(id) {
+            const projectId = id || document.getElementById('editProjectId').value;
+            if (!projectId) return;
+            document.getElementById('imageProjectId').value = projectId;
+            document.getElementById('imageCount').textContent = '0 files selected';
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function openEditModalFromData(projectId) {
+            const button = document.querySelector(`[data-edit-project-id="${projectId}"]`);
+            if (!button) return;
+            const title = button.dataset.projectTitle || '';
+            const desc = button.dataset.projectDesc || '';
+            const stack = button.dataset.projectStack || '';
+            const git = button.dataset.projectGit || '';
+            openEditModal(projectId, title, desc, stack, git);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const openId = params.get('open_edit');
+            if (openId) {
+                openEditModalFromData(openId);
+            }
+        });
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        function openReplaceModal(imageId) {
+            document.getElementById('replaceImageId').value = imageId;
+            document.getElementById('replaceImageInput').value = '';
+            document.getElementById('replacePreviewText').textContent = 'No file chosen yet.';
+            document.getElementById('replaceModal').classList.add('active');
+        }
+
+        function closeReplaceModal() {
+            document.getElementById('replaceModal').classList.remove('active');
+        }
+
+        let projectImagesDataTransfer = new DataTransfer();
+
+        function renderProjectPreview() {
+            const preview = document.getElementById('projectPreview');
+            const countLabel = document.getElementById('projectPreviewCount');
+            preview.innerHTML = '';
+            const files = Array.from(projectImagesDataTransfer.files);
+            countLabel.textContent = files.length + ' file(s) selected';
+            if (!files.length) {
+                countLabel.textContent = '0 files selected';
+                return;
+            }
+            files.forEach((file, idx) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-card';
+
+                    const removeButton = document.createElement('button');
+                    removeButton.type = 'button';
+                    removeButton.className = 'preview-remove';
+                    removeButton.innerHTML = '&times;';
+                    removeButton.addEventListener('click', () => removeProjectImage(idx));
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = file.name;
+
+                    wrapper.appendChild(removeButton);
+                    wrapper.appendChild(img);
+                    preview.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function previewProjectImages(input) {
+            const files = Array.from(input.files);
+            files.forEach(file => {
+                const alreadyExists = Array.from(projectImagesDataTransfer.files).some(existing => existing.name === file.name && existing.size === file.size && existing.type === file.type);
+                if (!alreadyExists) {
+                    projectImagesDataTransfer.items.add(file);
+                }
+            });
+            input.files = projectImagesDataTransfer.files;
+            renderProjectPreview();
+        }
+
+        function removeProjectImage(index) {
+            const newTransfer = new DataTransfer();
+            Array.from(projectImagesDataTransfer.files).forEach((file, idx) => {
+                if (idx !== index) {
+                    newTransfer.items.add(file);
+                }
+            });
+            projectImagesDataTransfer = newTransfer;
+            const input = document.getElementById('projectImagesInput');
+            input.files = projectImagesDataTransfer.files;
+            renderProjectPreview();
+        }
+
+        function previewSiteImage(input) {
+            const previewCircle = document.getElementById('siteImagePreviewCircle');
+            if (!input.files.length) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (previewCircle.tagName.toLowerCase() === 'img') {
+                    previewCircle.src = e.target.result;
+                } else {
+                    const img = document.createElement('img');
+                    img.id = 'siteImagePreviewCircle';
+                    img.src = e.target.result;
+                    img.alt = 'Website Image';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.display = 'block';
+                    previewCircle.replaceWith(img);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function previewReplaceImage(input) {
+            const label = document.getElementById('replacePreviewText');
+            if (input.files.length) {
+                label.textContent = input.files[0].name;
+            } else {
+                label.textContent = 'No file chosen yet.';
+            }
+        }
+
+        function updateFileCount(input) {
+            document.getElementById('imageCount').textContent = input.files.length + ' file(s) selected';
+        }
+
+        function deleteImage(imageId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = '<input type="hidden" name="form_type" value="delete_image"><input type="hidden" name="image_id" value="' + imageId + '">';
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        document.addEventListener('click', (e) => {
+            const editModal = document.getElementById('editModal');
+            const imageModal = document.getElementById('imageModal');
+            const replaceModal = document.getElementById('replaceModal');
+            if (e.target === editModal) closeEditModal();
+            if (e.target === imageModal) closeImageModal();
+            if (e.target === replaceModal) closeReplaceModal();
+        });
+    </script>
 </body>
 </html>

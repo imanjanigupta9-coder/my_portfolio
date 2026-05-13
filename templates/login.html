@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <title>Subscriber Login | Anjani</title>
+    <title>{{ 'Admin Login' if admin else 'Subscriber Login' }} | Anjani</title>
 </head>
 <body class="login-body">
     <div class="login-container">
@@ -13,8 +13,12 @@
 
         <div class="login-box">
             <div class="login-header">
-                <h2>Join the Community<span>.</span></h2>
-                <p>Login as a <strong>Free Subscriber</strong> to access project documentation, source codes, and exclusive MCA learning materials[cite: 5].</p>
+                <h2>{{ 'Admin Login' if admin else 'Join the Community' }}<span>.</span></h2>
+                {% if admin %}
+                <p>Enter the admin password to access the website management dashboard.</p>
+                {% else %}
+                <p>Login as a <strong>Free Subscriber</strong> to access project documentation, source code links, and exclusive MCA learning materials.</p>
+                {% endif %}
             </div>
 
             {% with messages = get_flashed_messages() %}
@@ -25,23 +29,27 @@
               {% endif %}
             {% endwith %}
 
-            <form action="/subscriber_login" method="POST" class="auth-form">
+            <form action="{{ url_for('admin') if admin else url_for('sub_login') }}" method="POST" class="auth-form">
+                {% if not admin %}
                 <div class="input-group">
                     <label>Email Address</label>
                     <input type="email" name="email" placeholder="name@example.com" required>
                 </div>
-                
+                {% endif %}
+
                 <div class="input-group">
-                    <label>Password</label>
+                    <label>{{ 'Admin Password' if admin else 'Password' }}</label>
                     <input type="password" name="password" placeholder="••••••••" required>
                 </div>
 
-                <button type="submit" class="submit-btn">Access Materials</button>
+                <button type="submit" class="submit-btn">{{ 'Enter Dashboard' if admin else 'Access Materials' }}</button>
             </form>
 
+            {% if not admin %}
             <div class="login-footer">
                 <p>Are you the Admin? <a href="/admin">Login here</a></p>
             </div>
+            {% endif %}
         </div>
     </div>
 
