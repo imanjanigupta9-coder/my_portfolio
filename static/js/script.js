@@ -1,30 +1,91 @@
-// 1. THEME TOGGLE (With LocalStorage memory)
-const themeToggle = document.getElementById('theme-toggle');
-const body = document.body;
+// 1. NAVIGATION TOGGLE
+const navToggle = document.getElementById('navToggle');
+const navToggleHandle = document.getElementById('navToggleHandle');
+const navToggleText = navToggle.querySelector('.nav-toggle-text');
+const adminModal = document.getElementById('adminModal');
+const subModal = document.getElementById('subModal');
+const authTypeInput = document.getElementById('authTypeInput');
+const subscriberName = document.getElementById('subscriberName');
+const subscriberPassword = document.getElementById('subscriberPassword');
+const subscriberSubmit = document.getElementById('subscriberSubmit');
 
-// Check for saved theme preference on load
-if (localStorage.getItem('theme') === 'dark') {
-    body.classList.add('dark-theme');
+function setNavState(state) {
+    navToggle.dataset.state = state;
+    if (state === 'admin') {
+        navToggleText.textContent = 'Admin Login';
+        navToggle.classList.add('admin-active');
+    } else {
+        navToggleText.textContent = 'Free Subscriber';
+        navToggle.classList.remove('admin-active');
+    }
 }
 
-themeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark-theme');
-    // Save preference
-    if (body.classList.contains('dark-theme')) {
-        localStorage.setItem('theme', 'dark');
+navToggleHandle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const state = navToggle.dataset.state === 'admin' ? 'subscriber' : 'admin';
+    setNavState(state);
+});
+
+navToggle.addEventListener('click', () => {
+    const state = navToggle.dataset.state;
+    if (state === 'admin') {
+        openAdminModal();
     } else {
-        localStorage.setItem('theme', 'light');
+        openSubModal();
     }
 });
+
+function openAdminModal() {
+    adminModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAdminModal() {
+    adminModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function switchSubscriberAuth(type) {
+    const tabs = document.querySelectorAll('.auth-tab');
+    tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.auth === type));
+
+    authTypeInput.value = type;
+    if (type === 'sign-in') {
+        document.getElementById('subscriberModalTitle').textContent = 'Free Subscriber Sign In';
+        document.getElementById('subscriberModalDescription').textContent = 'Enter your email and password to access project materials.';
+        subscriberName.style.display = 'none';
+        subscriberPassword.placeholder = 'Password';
+        subscriberSubmit.textContent = 'Sign In';
+    } else {
+        document.getElementById('subscriberModalTitle').textContent = 'Free Subscriber Sign Up';
+        document.getElementById('subscriberModalDescription').textContent = 'Create an account with your email, name, and password.';
+        subscriberName.style.display = 'block';
+        subscriberPassword.placeholder = 'Create Password';
+        subscriberSubmit.textContent = 'Sign Up';
+    }
+}
+
+function openSubModal() {
+    switchSubscriberAuth('sign-in');
+    subModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSubModal() {
+    subModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+setNavState('subscriber');
 
 // 2. PROJECT MODAL LOGIC
 function showDetails(title, desc, stack, github) {
     document.getElementById('m-title').innerText = title;
     document.getElementById('m-stack').innerText = "Tech Stack: " + stack;
     document.getElementById('m-desc').innerText = desc;
-    
+
     let repoDiv = document.getElementById('m-repo');
-    
+
     // Display GitHub link or "Not Available"
     if (github && github !== "None" && github !== "" && github !== "null") {
         repoDiv.innerHTML = `
@@ -87,25 +148,18 @@ document.querySelectorAll('.scroll-section').forEach(section => {
     observer.observe(section);
 });
 
-// 5. ADMIN BUTTON APPEARS AFTER SCROLL
-const adminButton = document.getElementById('admin-scroll-btn');
-window.addEventListener('scroll', () => {
-    if (!adminButton) return;
-    if (window.scrollY > 420) {
-        adminButton.classList.add('show');
-    } else {
-        adminButton.classList.remove('show');
-    }
-});
-
-// 6. CLOSE MODALS ON OUTSIDE CLICK
+// 5. CLOSE MODALS ON OUTSIDE CLICK
 window.onclick = function(event) {
     const projectModal = document.getElementById('projectModal');
     const subModal = document.getElementById('subModal');
+    const adminModal = document.getElementById('adminModal');
     if (event.target == projectModal) {
         closeModal();
     }
     if (event.target == subModal) {
         closeSubModal();
+    }
+    if (event.target == adminModal) {
+        closeAdminModal();
     }
 }

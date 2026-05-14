@@ -201,10 +201,23 @@ def index():
 # --- SUBSCRIBER LOGIN ---
 @app.route('/subscriber_login', methods=['POST'])
 def sub_login():
+    auth_type = request.form.get('auth_type', 'sign-in')
     email = request.form.get('email')
-    if email:
+    password = request.form.get('password')
+    name = request.form.get('name')
+
+    if auth_type == 'sign-up' and email and password and name:
         session['is_subscriber'] = True
+        session['subscriber_email'] = email
+        session['subscriber_name'] = name
+        session['subscriber_password'] = password
         session['user_email'] = email
+    elif auth_type == 'sign-in' and email and password:
+        if session.get('subscriber_email') == email and session.get('subscriber_password') == password:
+            session['is_subscriber'] = True
+            session['user_email'] = email
+        else:
+            flash('Subscriber login failed. Please sign up first or use the correct credentials.')
     return redirect(url_for('index'))
 
 # --- ADMIN PANEL ---

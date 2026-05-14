@@ -17,17 +17,13 @@
             <a href="#about">About</a>
             <a href="#projects">Projects</a>
             <a href="#contact">Contact</a>
-            
-            {% if not session.get('is_subscriber') %}
-                <button class="sub-btn" onclick="openSubModal()">Free Subscriber</button>
-            {% else %}
-                <span class="sub-welcome">Hi, Subscriber!</span>
-            {% endif %}
 
-            <button id="theme-toggle" class="mode-btn">
-                <span class="icon-sun">☀️</span>
-                <span class="icon-moon">🌙</span>
-            </button>
+            <div class="nav-toggle-container">
+                <button id="navToggle" class="nav-toggle-btn" data-state="subscriber">
+                    <span class="nav-toggle-text">Free Subscriber</span>
+                    <span id="navToggleHandle" class="nav-toggle-handle"></span>
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -144,9 +140,6 @@
         </div>
     </section>
 
-    <!-- ADMIN BUTTON ON SCROLL -->
-    <a href="/admin" class="admin-scroll-btn" id="admin-scroll-btn">Admin Login</a>
-
     <!-- 7. MODALS -->
     
     <!-- Project Detail Modal -->
@@ -164,11 +157,31 @@
     <div id="subModal" class="modal">
         <div class="modal-content login-modal">
             <span class="close" onclick="closeSubModal()">&times;</span>
-            <h2>Free Subscriber Login</h2>
-            <p>Enter your email to access my project materials.</p>
-            <form action="/subscriber_login" method="POST">
-                <input type="email" name="email" placeholder="yourname@email.com" required>
-                <button type="submit" class="submit-btn">Access Materials</button>
+            <h2 id="subscriberModalTitle">Free Subscriber</h2>
+            <p id="subscriberModalDescription">Sign in or sign up to access exclusive project materials.</p>
+            <div class="auth-switch">
+                <button type="button" class="auth-tab active" data-auth="sign-in" onclick="switchSubscriberAuth('sign-in')">Sign In</button>
+                <button type="button" class="auth-tab" data-auth="sign-up" onclick="switchSubscriberAuth('sign-up')">Sign Up</button>
+            </div>
+            <form id="subscriberForm" action="/subscriber_login" method="POST">
+                <input type="hidden" name="auth_type" id="authTypeInput" value="sign-in">
+                <input id="subscriberName" type="text" name="name" placeholder="Your Name" style="display: none;">
+                <input id="subscriberEmail" type="email" name="email" placeholder="yourname@email.com" required>
+                <input id="subscriberPassword" type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="submit-btn" id="subscriberSubmit">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content login-modal">
+            <span class="close" onclick="closeAdminModal()">&times;</span>
+            <h2>Admin Login</h2>
+            <p>Enter your admin password to access the dashboard.</p>
+            <form action="/admin" method="POST">
+                <input type="password" name="password" placeholder="Admin Password" required>
+                <button type="submit" class="submit-btn">Login</button>
             </form>
         </div>
     </div>
