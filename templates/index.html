@@ -11,7 +11,7 @@
 <body>
     <!-- 1. NAVIGATION WITH THEME TOGGLE & SUBSCRIBER LOGIN -->
     <nav>
-        <div class="logo">{{ settings.site_name }}<span>.</span></div>
+<div class="logo" style="color: #38bdf8">Anjani<span>.</span></div>
         <div class="menu">
             <a href="#home">Home</a>
             <a href="#about">About</a>
@@ -30,10 +30,13 @@
     <!-- 2. HERO SECTION -->
     <section id="home" class="scroll-section hero-section">
         <div class="hero-content">
-            <div class="profile-wrapper">
-                <img src="{{ url_for('static', filename=settings.hero_image_url) if settings.hero_image_url else url_for('static', filename='images/profile.jpg') }}" class="profile-img" alt="{{ settings.site_name }}">
+            <div class="profile-container">
+                <div class="crystal-grid" id="crystalGrid"></div>
+                <div class="profile-wrapper">
+                    <img src="{{ url_for('static', filename=settings.hero_image_url) if settings.hero_image_url else url_for('static', filename='images/profile.jpg') }}" class="profile-img" alt="{{ settings.site_name }}">
+                </div>
             </div>
-            <h1 class="reveal-text">{{ settings.site_name }}<br><span>{{ settings.tagline }}</span></h1>
+            <h1 class="reveal-text" style="opacity: 0;">{{ settings.site_name }}<br><span>{{ settings.tagline }}</span></h1>
             <p class="hero-subtitle">{{ settings.about }}</p>
             <p class="location-tag">📍 {{ settings.location }}</p>
             <div class="hero-actions">
@@ -45,15 +48,22 @@
 
     <!-- 3. ABOUT & SKILLS SECTION -->
     <section id="about" class="scroll-section">
-        <div class="container">
-            <h2>About Me</h2>
-            <p>I am a passionate MCA graduate (Class of 2025) specializing in Python development, SQL database management, and Software Testing.</p>
-            
-            <div class="skills-grid">
-                <div class="skill-item">Python (OOP)</div>
-                <div class="skill-item">MySQL/SQLite</div>
-                <div class="skill-item">Manual Testing</div>
-                <div class="skill-item">Data Visualization</div>
+        <div class="container about-grid">
+            <div class="about-text">
+                <h2>About Me</h2>
+                <p>I am a passionate MCA graduate (Class of 2025) specializing in Python development, SQL database management, and Software Testing.</p>
+                <p>My work focuses on clean architecture, responsive interfaces, and intuitive web applications that feel professional and easy to use.</p>
+            </div>
+            <div class="about-card">
+                <h3>Core Skills</h3>
+                <div class="skills-grid">
+                    <div class="skill-item">Python (OOP)</div>
+                    <div class="skill-item">MySQL / SQLite</div>
+                    <div class="skill-item">Manual Testing</div>
+                    <div class="skill-item">Data Visualization</div>
+                    <div class="skill-item">Flask Web Apps</div>
+                    <div class="skill-item">Responsive UI</div>
+                </div>
             </div>
         </div>
     </section>
@@ -63,12 +73,20 @@
         <h2 class="section-title">My Projects</h2>
         <div class="grid">
             {% for pd in projects_data %}
-            <div class="card" onclick="showDetails('{{pd.project.title}}', '{{pd.project.description}}', '{{pd.project.stack}}', '{{pd.project.github_url}}')">
+            <div class="card{% if not session.get('is_subscriber') %} locked{% endif %}" onclick="handleProjectClick(this, {{ pd.project.title|tojson }}, {{ pd.project.description|tojson }}, {{ pd.project.stack|tojson }}, {{ pd.project.github_url|tojson }}, {{ 'true' if session.get('is_subscriber') else 'false' }})">
                 <div class="card-image-box">
                     {% if pd.images and pd.images | length > 0 %}
-                        <img id="projectMainImage-{{ pd.project.id }}" src="{{ url_for('static', filename=pd.images[0].image_url) }}" alt="{{ pd.project.title }}" class="project-img">
+                        <div class=\"image-carousel\" data-project-id=\"{{ pd.project.id }}\" data-image-count=\"{{ pd.images | length }}\">
+                            <img id=\"projectMainImage-{{ pd.project.id }}\" src=\"{{ url_for('static', filename=pd.images[0].image_url) }}\" alt=\"{{ pd.project.title }}\" class=\"project-img\">
+                            {% if pd.images | length > 1 %}
+                            <div class=\"image-nav-buttons\">
+                                <button class=\"img-prev\" onclick=\"event.stopPropagation(); prevProjectSlide({{ pd.project.id }})\">&#10094;</button>
+                                <button class=\"img-next\" onclick=\"event.stopPropagation(); nextProjectSlide({{ pd.project.id }})\">&#10095;</button>
+                            </div>
+                            {% endif %}
+                        </div>
                         {% if pd.images | length > 1 %}
-                        <div class="project-slider-thumbs">
+                        <div class=\"project-slider-thumbs\" style=\"display: none;\">
                             {% for img in pd.images %}
                             <img src="{{ url_for('static', filename=img.image_url) }}" data-img="{{ url_for('static', filename=img.image_url) }}" alt="Slide {{ loop.index }}" class="project-thumb" onclick="event.stopPropagation(); switchProjectSlide({{ pd.project.id }}, this.dataset.img)">
                             {% endfor %}
@@ -85,6 +103,11 @@
                     <h3>{{ pd.project.title }}</h3>
                     <small>{{ pd.project.stack }}</small>
                 </div>
+                {% if not session.get('is_subscriber') %}
+                <div class="card-overlay">
+                    <span>Subscribe free to view</span>
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
             
@@ -194,6 +217,9 @@
         </a>
     </div>
 
+    <footer class="site-footer">
+        <p>©2026 Developed By Anjani Kumar Gupta</p>
+    </footer>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
